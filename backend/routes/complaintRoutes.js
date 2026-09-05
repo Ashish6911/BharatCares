@@ -19,6 +19,8 @@ const upload = multer({
   storage: storage,
 });
 router.post("/", protect, upload.single("image"), async (req, res) => {
+  console.log("🔥 COMPLAINT POST REACHED");
+  console.log("FILE:", req.file);
 
   try {
     const { title, description, category, location } = req.body;
@@ -28,6 +30,8 @@ router.post("/", protect, upload.single("image"), async (req, res) => {
         message: "Title, description, category and location are required",
       });
     }
+
+    console.log("☁️ ABOUT TO SAVE COMPLAINT");
 
     const complaint = await Complaint.create({
       title,
