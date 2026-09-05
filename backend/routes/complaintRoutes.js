@@ -231,11 +231,12 @@ router.delete("/:id", protect, async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({
-      message: "Server error",
-      error: error.message,
-    });
-  }
+  console.log("CREATE COMPLAINT ERROR:", error);
+  res.status(500).json({
+    message: "Server error",
+    error: error.message,
+  });
+}
 });
 
 module.exports = router;
