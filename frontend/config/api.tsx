@@ -1,1 +1,1 @@
-export const API_URL = 'http://10.215.48.75:5000';
+export const API_URL = 'https://bharatcares.onrender.com';
