@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
-
+import { API_URL } from '@/config/api';
 import {
   Alert,
   StyleSheet,
@@ -13,7 +13,7 @@ import {
 import { useState } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://192.168.1.12:5000';
+
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -129,7 +129,7 @@ export default function LoginScreen() {
           style={styles.input}
           placeholder="Password"
           placeholderTextColor="#888"
-          secureTextEntry
+          //secureTextEntry
           value={password}
           onChangeText={setPassword}
         />

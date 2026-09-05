@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import axios from 'axios';
 import { useState } from 'react';
-
+import { API_URL } from '@/config/api';
 import {
   ActivityIndicator,
   Alert,
@@ -16,7 +16,7 @@ import {
   View,
 } from 'react-native';
 
-const API_URL = 'http://192.168.1.12:5000';
+
 
 export default function SignupScreen() {
   const [name, setName] = useState('');

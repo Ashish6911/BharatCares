@@ -2,7 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import { API_URL } from '@/config/api';
 import {
   ActivityIndicator,
   Alert,
@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native';
 
-const API_URL = 'http://192.168.1.12:5000';
+
 
 type User = {
   _id?: string;

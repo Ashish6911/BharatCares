@@ -2,7 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { router, useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-
+import { API_URL } from '@/config/api';
 import {
   ActivityIndicator,
   Alert,
@@ -17,7 +17,6 @@ import {
   View,
 } from 'react-native';
 
-const API_URL = 'http://192.168.1.12:5000';
 
 type Comment = {
   _id: string;

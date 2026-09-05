@@ -2,7 +2,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { router, useFocusEffect } from 'expo-router';
-
+import { API_URL } from '@/config/api';
 import {
   Alert,
   FlatList,
@@ -15,7 +15,7 @@ import {
   View,
 } from 'react-native';
 
-const API_URL = 'http://192.168.1.12:5000';
+
 
 type Complaint = {
   _id: string;
