@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import * as ImagePicker from 'expo-image-picker';
-
+import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import axios from 'axios';
 import { useState } from 'react';
@@ -9,6 +9,7 @@ import { API_URL } from '@/config/api';
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -26,8 +27,13 @@ import {
 export default function CreateComplaintScreen() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [location, setLocation] = useState('');
+const [category, setCategory] = useState('');
+const [location, setLocation] = useState('');
+
+const [coordinates, setCoordinates] = useState<{
+  latitude: number;
+  longitude: number;
+} | null>(null);
 
   const [image, setImage] =
     useState<ImagePicker.ImagePickerAsset | null>(
@@ -77,6 +83,93 @@ export default function CreateComplaintScreen() {
       );
     }
   };
+
+
+
+
+
+// =========================
+// GET CURRENT LOCATION
+// =========================
+
+const getCurrentLocation = async () => {
+  try {
+    const { status } =
+      await Location.requestForegroundPermissionsAsync();
+
+    if (status !== 'granted') {
+      Alert.alert(
+        'Location Permission',
+        'Location permission is required to get your current location.'
+      );
+      return;
+    }
+
+    const currentLocation =
+      await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+    const { latitude, longitude } =
+      currentLocation.coords;
+
+    setCoordinates({
+      latitude,
+      longitude,
+    });
+
+    setLocation(
+      `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+    );
+
+    console.log('CURRENT LOCATION:', {
+      latitude,
+      longitude,
+    });
+  } catch (error) {
+    console.log('LOCATION ERROR:', error);
+
+    Alert.alert(
+      'Location Error',
+      'Could not get your current location.'
+    );
+  }
+};
+
+
+
+
+// =========================
+// OPEN LOCATION IN GOOGLE MAPS
+// =========================
+
+const openGoogleMaps = async () => {
+  if (!coordinates) {
+    Alert.alert(
+      'Location Required',
+      'Please get your current location first.'
+    );
+    return;
+  }
+
+  const { latitude, longitude } = coordinates;
+
+  const googleMapsUrl =
+    `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+
+  try {
+    await Linking.openURL(googleMapsUrl);
+  } catch (error) {
+    console.log('GOOGLE MAPS ERROR:', error);
+
+    Alert.alert(
+      'Error',
+      'Could not open Google Maps.'
+    );
+  }
+};
+
+
 
   // =========================
   // REMOVE PHOTO
@@ -145,7 +238,17 @@ export default function CreateComplaintScreen() {
         'location',
         location.trim()
       );
+if (coordinates) {
+  formData.append(
+    'latitude',
+    coordinates.latitude.toString()
+  );
 
+  formData.append(
+    'longitude',
+    coordinates.longitude.toString()
+  );
+}
       // =========================
       // ADD IMAGE
       // =========================
@@ -181,17 +284,15 @@ export default function CreateComplaintScreen() {
         }
       }
 
-      const response = await axios.post(
-        `${API_URL}/api/complaints`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type':
-              'multipart/form-data',
-          },
-        }
-      );
+   const response = await axios.post(
+  `${API_URL}/api/complaints`,
+  formData,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
       console.log(
         'CREATE COMPLAINT:',
@@ -326,19 +427,42 @@ export default function CreateComplaintScreen() {
             onChangeText={setCategory}
           />
 
-          {/* LOCATION */}
+        <Text style={styles.label}>
+  Location
+</Text>
 
-          <Text style={styles.label}>
-            Location
-          </Text>
+<TouchableOpacity
+  style={styles.photoButton}
+  onPress={getCurrentLocation}
+>
+  <Text style={styles.cameraIcon}>
+    📍
+  </Text>
 
-          <TextInput
-            style={styles.input}
-            placeholder="Where is the problem?"
-            placeholderTextColor="#888"
-            value={location}
-            onChangeText={setLocation}
-          />
+  <Text style={styles.photoButtonText}>
+    {coordinates
+      ? 'Location Captured'
+      : 'Get Current Location'}
+  </Text>
+</TouchableOpacity>
+
+{coordinates && (
+  <>
+    <Text style={styles.locationText}>
+      {coordinates.latitude.toFixed(6)},{' '}
+      {coordinates.longitude.toFixed(6)}
+    </Text>
+
+    <TouchableOpacity
+      style={styles.mapButton}
+      onPress={openGoogleMaps}
+    >
+      <Text style={styles.mapButtonText}>
+        🗺️ Open in Google Maps
+      </Text>
+    </TouchableOpacity>
+  </>
+)}
 
           {/* PHOTO */}
 
@@ -445,6 +569,29 @@ export default function CreateComplaintScreen() {
 }
 
 const styles = StyleSheet.create({
+
+
+  locationText: {
+  marginTop: 10,
+  fontSize: 14,
+  color: '#555555',
+  textAlign: 'center',
+},
+
+mapButton: {
+  height: 48,
+  backgroundColor: '#eeeeee',
+  borderRadius: 12,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 10,
+},
+
+mapButtonText: {
+  fontSize: 14,
+  fontWeight: '700',
+  color: '#111111',
+},
 
   container: {
     flex: 1,

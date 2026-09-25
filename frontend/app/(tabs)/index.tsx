@@ -822,22 +822,14 @@ export default function HomeScreen() {
               {item.image && (
                 <TouchableOpacity
                   activeOpacity={0.95}
-                  onPress={() =>
-                    setSelectedImage(
-                      `${API_URL}/${item.image!.replace(
-                        /\\/g,
-                        '/'
-                      )}`
-                    )
-                  }
+               onPress={() =>
+  setSelectedImage(item.image)
+}
                 >
-                  <Image
-                    source={{
-                      uri: `${API_URL}/${item.image.replace(
-                        /\\/g,
-                        '/'
-                      )}`,
-                    }}
+                <Image
+  source={{
+    uri: item.image,
+  }}
                     style={
                       styles.postImage
                     }

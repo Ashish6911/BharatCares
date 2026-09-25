@@ -25,11 +25,27 @@ const complaintSchema = new mongoose.Schema(
       default: null,
     },
 
-    location: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+   location: {
+  type: String,
+  required: true,
+  trim: true,
+},
+
+latitude: {
+  type: Number,
+  required: false,
+},
+
+longitude: {
+  type: Number,
+  required: false,
+},
+
+createdBy: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  required: true,
+},
 
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,

@@ -23,7 +23,14 @@ router.post("/", protect, upload.single("image"), async (req, res) => {
   console.log("FILE:", req.file);
 
   try {
-    const { title, description, category, location } = req.body;
+  const {
+  title,
+  description,
+  category,
+  location,
+  latitude,
+  longitude,
+} = req.body;
 
     if (!title || !description || !category || !location) {
       return res.status(400).json({
@@ -33,14 +40,16 @@ router.post("/", protect, upload.single("image"), async (req, res) => {
 
     console.log("☁️ ABOUT TO SAVE COMPLAINT");
 
-    const complaint = await Complaint.create({
-      title,
-      description,
-      category,
-      location,
-      image: req.file ? req.file.path : null,
-      createdBy: req.user.userId,
-    });
+ const complaint = await Complaint.create({
+  title,
+  description,
+  category,
+  location,
+  latitude: latitude ? Number(latitude) : null,
+  longitude: longitude ? Number(longitude) : null,
+  image: req.file ? req.file.path : null,
+  createdBy: req.user.userId,
+});
 
     res.status(201).json({
       message: "Complaint submitted successfully",
