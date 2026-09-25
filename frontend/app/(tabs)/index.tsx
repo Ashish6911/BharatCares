@@ -3,9 +3,11 @@ import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { router, useFocusEffect } from 'expo-router';
 import { API_URL } from '@/config/api';
+  
 import {
   Alert,
   FlatList,
+    Linking,
   Image,
   Modal,
   SafeAreaView,
@@ -25,6 +27,8 @@ type Complaint = {
   image: string | null;
   location: string;
   status: string;
+  latitude?: number;
+longitude?: number;
   createdBy: {
     _id: string;
     name: string;
@@ -868,6 +872,27 @@ export default function HomeScreen() {
                 >
                   📍 {item.location}
                 </Text>
+{item.latitude != null &&
+  item.longitude != null && (
+    <TouchableOpacity
+      style={styles.mapButton}
+      onPress={() => {
+        const url =
+          `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`;
+
+        Linking.openURL(url);
+      }}
+    >
+      <Text style={styles.mapButtonText}>
+        🗺️ View Exact Location
+      </Text>
+    </TouchableOpacity>
+  )}
+
+
+
+
+
 
                 {/* STATUS */}
 
@@ -1025,6 +1050,23 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
+
+
+
+  mapButton: {
+  marginTop: 10,
+  backgroundColor: '#eeeeee',
+  paddingVertical: 10,
+  paddingHorizontal: 14,
+  borderRadius: 10,
+  alignSelf: 'flex-start',
+},
+
+mapButtonText: {
+  fontSize: 13,
+  fontWeight: '700',
+  color: '#111111',
+},
 
   container: {
     flex: 1,
