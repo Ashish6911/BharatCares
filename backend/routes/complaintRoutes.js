@@ -86,11 +86,20 @@ router.post(
           );
 
         } catch (error) {
-          console.log(
-            "CITY DETECTION ERROR:",
-            error.response?.data ||
-              error.message
-          );
+         console.log(
+  "CITY DETECTION ERROR STATUS:",
+  error.response?.status
+);
+
+console.log(
+  "CITY DETECTION ERROR DATA:",
+  error.response?.data
+);
+
+console.log(
+  "CITY DETECTION ERROR MESSAGE:",
+  error.message
+);
         }
       }
 
