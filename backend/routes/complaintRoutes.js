@@ -5,6 +5,7 @@ const Complaint = require("../models/Complaint");
 const protect = require("../middleware/authMiddleware");
 const adminOnly = require("../middleware/roleMiddleware");
 const router = express.Router();
+const axios = require("axios");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
 const storage = new CloudinaryStorage({
@@ -23,7 +24,7 @@ router.post("/", protect, upload.single("image"), async (req, res) => {
   console.log("FILE:", req.file);
 
   try {
-  const {
+const {
   title,
   description,
   category,
@@ -31,6 +32,40 @@ router.post("/", protect, upload.single("image"), async (req, res) => {
   latitude,
   longitude,
 } = req.body;
+
+let city = null;
+
+if (latitude && longitude) {
+  try {
+    const geoResponse = await axios.get(
+      "https://nominatim.openstreetmap.org/reverse",
+      {
+        params: {
+          lat: latitude,
+          lon: longitude,
+          format: "json",
+          addressdetails: 1,
+        },
+        headers: {
+          "User-Agent": "Bharat-Cares-App",
+        },
+      }
+    );
+
+    city =
+      geoResponse.data?.address?.city ||
+      geoResponse.data?.address?.town ||
+      geoResponse.data?.address?.village ||
+      null;
+
+    console.log("📍 DETECTED CITY:", city);
+  } catch (error) {
+    console.log(
+      "CITY DETECTION ERROR:",
+      error.message
+    );
+  }
+}
 
     if (!title || !description || !category || !location) {
       return res.status(400).json({
@@ -45,6 +80,7 @@ router.post("/", protect, upload.single("image"), async (req, res) => {
   description,
   category,
   location,
+   city,
   latitude: latitude ? Number(latitude) : null,
   longitude: longitude ? Number(longitude) : null,
   image: req.file ? req.file.path : null,

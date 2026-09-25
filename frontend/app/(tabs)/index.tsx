@@ -8,6 +8,7 @@ import {
   Alert,
   FlatList,
     Linking,
+    TextInput,
   Image,
   Modal,
   SafeAreaView,
@@ -29,6 +30,7 @@ type Complaint = {
   status: string;
   latitude?: number;
 longitude?: number;
+city?: string;
   createdBy: {
     _id: string;
     name: string;
@@ -66,6 +68,9 @@ export default function HomeScreen() {
 
   const [currentUserId, setCurrentUserId] =
     useState<string | null>(null);
+
+    const [citySearch, setCitySearch] = useState('');
+const [selectedCity, setSelectedCity] = useState('');
 
   // =========================
   // FETCH COMPLAINTS
@@ -448,17 +453,25 @@ export default function HomeScreen() {
   // COMBINE FEED
   // =========================
 
-  const feedItems = [
-    ...complaints.map((item) => ({
-      ...item,
-      type: 'complaint' as const,
-    })),
+const filteredComplaints = selectedCity
+  ? complaints.filter((item) =>
+      item.city
+        ?.toLowerCase()
+        .includes(selectedCity.toLowerCase())
+    )
+  : complaints;
 
-    ...suggestions.map((item) => ({
-      ...item,
-      type: 'suggestion' as const,
-    })),
-  ];
+const feedItems = [
+  ...filteredComplaints.map((item) => ({
+    ...item,
+    type: 'complaint' as const,
+  })),
+
+  ...suggestions.map((item) => ({
+    ...item,
+    type: 'suggestion' as const,
+  })),
+];
 
   // =========================
   // LOADING
@@ -494,7 +507,18 @@ export default function HomeScreen() {
         <Text style={styles.logo}>
           Bharat Cares
         </Text>
-
+<View style={styles.citySearchContainer}>
+<TextInput
+  value={citySearch}
+  onChangeText={(text) => {
+    setCitySearch(text);
+    setSelectedCity(text.trim());
+  }}
+  placeholder="Search city"
+  placeholderTextColor="#888"
+  style={styles.citySearchInput}
+/>
+</View>
         <TouchableOpacity
           onPress={() =>
             router.push(
@@ -521,20 +545,30 @@ export default function HomeScreen() {
           styles.feed
         }
 
-        ListEmptyComponent={
-          <View style={styles.center}>
+      ListEmptyComponent={
+  selectedCity ? (
+    <View style={styles.center}>
+      <Text style={styles.emptyTitle}>
+        No complaints found
+      </Text>
 
-            <Text style={styles.emptyTitle}>
-              Nothing here yet
-            </Text>
+      <Text style={styles.emptyText}>
+        No complaints found in {selectedCity}
+      </Text>
+    </View>
+  ) : (
+    <View style={styles.center}>
+      <Text style={styles.emptyTitle}>
+        Nothing here yet
+      </Text>
 
-            <Text style={styles.emptyText}>
-              Be the first person to share
-              something.
-            </Text>
-
-          </View>
-        }
+      <Text style={styles.emptyText}>
+        Be the first person to share
+        something.
+      </Text>
+    </View>
+  )
+}
 
         renderItem={({ item }) => {
 
@@ -1051,7 +1085,20 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
 
+citySearchContainer: {
+  width: 130,
+  marginLeft: 12,
+  marginRight: 8,
+},
 
+citySearchInput: {
+  height: 40,
+  backgroundColor: '#f1f1f1',
+  borderRadius: 20,
+  paddingHorizontal: 14,
+  fontSize: 13,
+  color: '#111111',
+},
 
   mapButton: {
   marginTop: 10,
